@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etanol Dönüştürücü - w/w ↔ v/v</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .converter-section {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group:focus-within {
+            background: #e8e8e8;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="number"] {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 15px;
+            font-size: 16px;
+            color: #333;
+            outline: none;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 1;
+        }
+
+        .unit {
+            padding: 12px 15px;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .arrow {
+            text-align: center;
+            color: #667eea;
+            font-size: 24px;
+            margin: 20px 0;
+        }
+
+        .info {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 30px;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .info strong {
+            color: #667eea;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Etanol Dönüştürücü</h1>
+        <p class="subtitle">w/w ↔ v/v Konsantrasyon Çevirici</p>
+
+        <div class="converter-section">
+            <label for="ww-input">Ağırlık/Ağırlık (w/w) %</label>
+            <div class="input-group">
+                <input type="number" id="ww-input" placeholder="0.00" step="0.01" min="0" max="100">
+                <span class="unit">% (w/w)</span>
+            </div>
+        </div>
+
+        <div class="arrow">⇅</div>
+
+        <div class="converter-section">
+            <label for="vv-input">Hacim/Hacim (v/v) %</label>
+            <div class="input-group">
+                <input type="number" id="vv-input" placeholder="0.00" step="0.01" min="0" max="100">
+                <span class="unit">% (v/v)</span>
+            </div>
+        </div>
+
+        <div class="info">
+            <strong>Not:</strong> Bu dönüştürücü, sulu etanol çözeltileri için 20°C sıcaklıkta hesaplama yapar.
+            Etanol yoğunluğu: 0.789 g/mL, Su yoğunluğu: 1.0 g/mL kullanılmaktadır.
+        </div>
+    </div>
+
+    <script>
+        const wwInput = document.getElementById('ww-input');
+        const vvInput = document.getElementById('vv-input');
+
+        // Etanol yoğunluğu (g/mL) 20°C'de
+        const RHO_ETHANOL = 0.789;
+        const RHO_WATER = 1.0;
+
+        // w/w'den v/v'ye dönüşüm
+        function wwToVV(ww) {
+            if (ww === '' || ww < 0 || ww > 100) return '';
+            
+            const wwDecimal = ww / 100;
+            
+            // Çözelti yoğunluğu hesabı
+            const rhoSolution = 1 / (wwDecimal / RHO_ETHANOL + (1 - wwDecimal) / RHO_WATER);
+            
+            // v/v hesabı
+            const vv = (wwDecimal * rhoSolution / RHO_ETHANOL) * 100;
+            
+            return vv.toFixed(2);
+        }
+
+        // v/v'den w/w'ye dönüşüm
+        function vvToWW(vv) {
+            if (vv === '' || vv < 0 || vv > 100) return '';
+            
+            const vvDecimal = vv / 100;
+            
+            // Etanol ve su kütleleri (100 mL çözelti için)
+            const massEthanol = vvDecimal * 100 * RHO_ETHANOL;
+            const massWater = (1 - vvDecimal) * 100 * RHO_WATER;
+            
+            // w/w hesabı
+            const ww = (massEthanol / (massEthanol + massWater)) * 100;
+            
+            return ww.toFixed(2);
+        }
+
+        // w/w giriş değiştiğinde
+        wwInput.addEventListener('input', function(e) {
+            const wwValue = parseFloat(e.target.value);
+            if (!isNaN(wwValue) && wwValue >= 0 && wwValue <= 100) {
+                vvInput.value = wwToVV(wwValue);
+            } else if (e.target.value === '') {
+                vvInput.value = '';
+            }
+        });
+
+        // v/v giriş değiştiğinde
+        vvInput.addEventListener('input', function(e) {
+            const vvValue = parseFloat(e.target.value);
+            if (!isNaN(vvValue) && vvValue >= 0 && vvValue <= 100) {
+                wwInput.value = vvToWW(vvValue);
+            } else if (e.target.value === '') {
+                wwInput.value = '';
+            }
+        });
+
+        // Enter tuşu ile diğer alana geçiş
+        wwInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                vvInput.focus();
+            }
+        });
+
+        vvInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                wwInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>

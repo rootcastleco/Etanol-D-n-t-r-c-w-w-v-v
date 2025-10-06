@@ -1,0 +1,237 @@
+<!doctype html>
+
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Etanol Dönüştürücü – w/w ↔ v/v</title>
+  <style>
+    :root{--bg:#0b1220;--card:#111829;--muted:#93a2c8;--text:#e9efff;--acc:#4aa4ff;--acc2:#7be495;}
+    *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#0b1220,#0d1426 60%,#0b1220);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+    .wrap{max-width:980px;margin:auto;padding:24px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
+    h1{font-size: clamp(22px,3.5vw,34px);margin:0;font-weight:800;letter-spacing:.3px}
+    .card{background:var(--card);border:1px solid #1b2542;border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+    input,select,button{width:100%;border-radius:12px;border:1px solid #233056;background:#0c1326;color:var(--text);padding:12px 14px}
+    input::placeholder{color:#6f7fb1}
+    button{cursor:pointer;background:linear-gradient(180deg,#1e6bff,#0d5bff);border:1px solid #2a72ff;font-weight:700}
+    button.secondary{background:#0c1326;border-color:#27407a}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .note{color:var(--muted);font-size:13px}
+    .result{display:flex;align-items:center;gap:12px;margin-top:8px}
+    .result .value{font-size:28px;font-weight:900}
+    .tag{font-size:12px;color:#0b1429;background:#a6d8ff;border-radius:999px;padding:2px 8px;font-weight:700}
+    .foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px}
+    .muted{color:#94a3c6}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-weight:700;background:#0b1420;border:1px solid #1a2445;padding:2px 6px;border-radius:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Etanol Dönüştürücü <span class="tag">w/w ↔ v/v</span></h1>
+    </header><div class="grid">
+  <!-- w/w -->
+  <section class="card" id="card-w2v">
+    <h2 style="margin:0 0 8px 0">Ağırlıkça → Hacimce</h2>
+    <p class="note">%w/w → %v/v dönüşümü. Formül: <span class="kbd">ϕ<sub>v</sub> = w · (ρ<sub>çöz</sub> / ρ<sub>EtOH</sub>)</span>. Burada ϕ<sub>v</sub> = v/v fraksiyonu.</p>
+    <div class="row">
+      <div>
+        <label>% w/w (etanol)</label>
+        <input type="number" id="w_w" placeholder="örn. 40" min="0" max="100" step="0.01" />
+      </div>
+      <div>
+        <label>Sıcaklık (°C)</label>
+        <select id="temp1">
+          <option>15</option>
+          <option selected>20</option>
+          <option>25</option>
+        </select>
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div>
+        <label>Çözeltinin yoğunluğu ρ<sub>çöz</sub> (g/mL) <span class="muted">(opsiyonel)</span></label>
+        <input type="number" id="rho_sol1" placeholder="biliniyorsa girin; boş bırakılabilir" step="0.0001" min="0.75" max="1.05" />
+      </div>
+      <div>
+        <label>Yaklaşık yoğunluk modeli</label>
+        <select id="model1">
+          <option value="mix" selected>Doğrusal karışım ~ (yaklaşık)</option>
+          <option value="table">Tabloyu kullan (20 °C) + küçük düzeltme</option>
+        </select>
+      </div>
+    </div>
+    <div class="foot">
+      <button id="btn1">Hesapla</button>
+      <div class="result"><span class="muted">Sonuç:</span> <span class="value" id="out1">—</span> <span class="muted">% v/v</span></div>
+    </div>
+  </section>
+
+  <!-- v/v -->
+  <section class="card" id="card-v2w">
+    <h2 style="margin:0 0 8px 0">Hacimce → Ağırlıkça</h2>
+    <p class="note">%v/v → %w/w dönüşümü. Formül: <span class="kbd">w = ϕ<sub>v</sub> · (ρ<sub>EtOH</sub> / ρ<sub>çöz</sub>)</span>.</p>
+    <div class="row">
+      <div>
+        <label>% v/v (etanol)</label>
+        <input type="number" id="v_v" placeholder="örn. 70" min="0" max="100" step="0.01" />
+      </div>
+      <div>
+        <label>Sıcaklık (°C)</label>
+        <select id="temp2">
+          <option>15</option>
+          <option selected>20</option>
+          <option>25</option>
+        </select>
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div>
+        <label>Çözeltinin yoğunluğu ρ<sub>çöz</sub> (g/mL) <span class="muted">(opsiyonel)</span></label>
+        <input type="number" id="rho_sol2" placeholder="biliniyorsa girin; boş bırakılabilir" step="0.0001" min="0.75" max="1.05" />
+      </div>
+      <div>
+        <label>Yaklaşık yoğunluk modeli</label>
+        <select id="model2">
+          <option value="mix" selected>Doğrusal karışım ~ (yaklaşık)</option>
+          <option value="table">Tabloyu kullan (20 °C) + küçük düzeltme</option>
+        </select>
+      </div>
+    </div>
+    <div class="foot">
+      <button class="secondary" id="btn2">Hesapla</button>
+      <div class="result"><span class="muted">Sonuç:</span> <span class="value" id="out2">—</span> <span class="muted">% w/w</span></div>
+    </div>
+  </section>
+</div>
+
+<section class="card" style="margin-top:16px">
+  <h3 style="margin:0 0 6px 0">Notlar & Sınırlar</h3>
+  <ul style="margin:6px 0 0 18px;line-height:1.35">
+    <li>Bu araç, laboratuvar pratikleri için hızlı <strong>yaklaşık</strong> dönüşüm verir. En doğru sonuç için ρ<sub>çöz</sub> değerini <em>ölçerek</em> girin.</li>
+    <li>ρ<sub>EtOH</sub> (g/mL): 15 °C ≈ 0.791, 20 °C ≈ 0.789, 25 °C ≈ 0.785.</li>
+    <li>ρ<sub>H₂O</sub> (g/mL): 15 °C ≈ 0.9991, 20 °C ≈ 0.9982, 25 °C ≈ 0.9970.</li>
+    <li>Tablo modeli 20 °C için örnek veriyle aradeğerleme yapar; sıcaklık farkına ±0.0003/°C düzeltmesi uygular.</li>
+  </ul>
+</section>
+
+  </div>  <script>
+    // Yoğunluk tabloları ve yardımcılar
+    const rhoEtOH = {15:0.791, 20:0.789, 25:0.785};
+    const rhoH2O  = {15:0.9991,20:0.9982,25:0.9970};
+
+    // 20 °C için yaklaşık ρ_solution (g/mL) vs %w/w EtOH (örnek aradeğerlenebilir tablo)
+    const table20 = [
+      {w:0,   rho:0.9982},
+      {w:10,  rho:0.9890},
+      {w:20,  rho:0.9790},
+      {w:30,  rho:0.9695},
+      {w:40,  rho:0.9600},
+      {w:50,  rho:0.9495},
+      {w:60,  rho:0.9380},
+      {w:70,  rho:0.9250},
+      {w:80,  rho:0.9100},
+      {w:90,  rho:0.8980},
+      {w:95,  rho:0.8900},
+      {w:100, rho:0.7890}
+    ];
+
+    function clamp(x,min,max){return Math.max(min,Math.min(max,x))}
+
+    function lerp(a,b,t){return a+(b-a)*t}
+
+    // Aradeğerleme ile 20°C tablo yoğunluğu
+    function rhoFromTableAt20(w){
+      w = clamp(w,0,100);
+      for(let i=0;i<table20.length-1;i++){
+        const a=table20[i], b=table20[i+1];
+        if(w>=a.w && w<=b.w){
+          const t=(w-a.w)/(b.w-a.w);
+          return lerp(a.rho,b.rho,t);
+        }
+      }
+      return table20[table20.length-1].rho;
+    }
+
+    // Sıcaklık düzeltmesi (çok kaba): dρ/dT ≈ -0.00030 g/mL·°C
+    function tempAdjust(rho20, T){
+      const dT = (T-20);
+      return rho20 + (-0.00030)*dT;
+    }
+
+    // Doğrusal karışım yaklaşımı (yaklaşık): rho_mix ≈ w*rho_EtOH + (1-w)*rho_H2O
+    function rhoMixLinear(w, T){
+      const rE = rhoEtOH[T];
+      const rW = rhoH2O[T];
+      const wf = clamp(w/100,0,1);
+      return wf*rE + (1-wf)*rW;
+    }
+
+    function fmt(x){
+      if(!isFinite(x)) return "—";
+      return (Math.round(x*1000)/1000).toLocaleString("tr-TR");
+    }
+
+    function calcVFromW(){
+      const w = parseFloat(document.getElementById('w_w').value);
+      const T = parseInt(document.getElementById('temp1').value,10);
+      const rhoUser = parseFloat(document.getElementById('rho_sol1').value);
+      const model = document.getElementById('model1').value;
+      if(isNaN(w)) {document.getElementById('out1').textContent='—';return}
+      const wFrac = clamp(w/100,0,1);
+      const rhoE = rhoEtOH[T];
+      let rhoSol;
+      if(!isNaN(rhoUser)){
+        rhoSol = rhoUser;
+      } else if(model==='table'){
+        const rho20 = rhoFromTableAt20(w);
+        rhoSol = tempAdjust(rho20, T);
+      } else {
+        rhoSol = rhoMixLinear(w, T);
+      }
+      const vfrac = wFrac * (rhoSol / rhoE); // v/v fraksiyonu
+      const vperc = clamp(vfrac*100,0,100);
+      document.getElementById('out1').textContent = fmt(vperc);
+    }
+
+    function calcWFromV(){
+      const v = parseFloat(document.getElementById('v_v').value);
+      const T = parseInt(document.getElementById('temp2').value,10);
+      const rhoUser = parseFloat(document.getElementById('rho_sol2').value);
+      const model = document.getElementById('model2').value;
+      if(isNaN(v)) {document.getElementById('out2').textContent='—';return}
+      const vFrac = clamp(v/100,0,1);
+      const rhoE = rhoEtOH[T];
+      // ρ_solution yaklaşık: w bilinmiyor; v'ye yakınlamak için lineer bir tahmin kullan
+      let rhoSol;
+      if(!isNaN(rhoUser)){
+        rhoSol = rhoUser;
+      } else if(model==='table'){
+        // İlk tahmin için w≈v (fraksiyon olarak) varsay ve tabloyu kullan
+        const wGuess = v;
+        const rho20 = rhoFromTableAt20(wGuess);
+        rhoSol = tempAdjust(rho20, T);
+      } else {
+        // lineer karışımda da ilk tahmin için w≈v kullan
+        rhoSol = rhoMixLinear(v, T);
+      }
+      const wfrac = vFrac * (rhoE / rhoSol);
+      const wperc = clamp(wfrac*100,0,100);
+      document.getElementById('out2').textContent = fmt(wperc);
+    }
+
+    document.getElementById('btn1').addEventListener('click', calcVFromW);
+    document.getElementById('btn2').addEventListener('click', calcWFromV);
+
+    // Klavye kısayolları: Enter aktif kartı çalıştırır
+    ['w_w','rho_sol1'].forEach(id=>{
+      document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter') calcVFromW()})
+    });
+    ['v_v','rho_sol2'].forEach(id=>{
+      document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter') calcWFromV()})
+    });
+  </script></body>
+</html>
